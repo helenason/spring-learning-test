@@ -50,6 +50,5 @@ public class QueryCreationTest {
 
         List<Customer> customers = customerRepository.findByLastNameOrderByFirstNameDesc("Bauer");
         assertThat(customers).extracting(Customer::getFirstName).containsExactly("Kim", "Jack");
-
     }
 }
