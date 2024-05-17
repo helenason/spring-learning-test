@@ -12,11 +12,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 public class ManyToManyTest {
-    @Autowired
-    private BookRepository bookRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
+    @Autowired
+    private BookRepository bookRepository;
 
     @Test
     void intermediateEntity() {
@@ -41,5 +41,26 @@ public class ManyToManyTest {
         Optional<Book> persistBook = bookRepository.findById(book.getId());
         assertThat(persistBook).isNotEmpty();
         assertThat(persistBook.get().getAuthors()).isNotEmpty();
+
+        /*
+        select
+            a1_0.book_id,
+            a1_0.id,
+            a2_0.id,
+            p1_0.id,
+            p1_0.name
+        from
+            book_author a1_0
+        left join
+            author a2_0
+                on a2_0.id=a1_0.author_id
+        left join
+            person p1_0
+                on p1_0.id=a2_0.person_id
+        where
+            a1_0.book_id=?
+
+        person 테이블까지 참조하는 이유는, Author 클래스의 Person 이 @OneToOne (EAGER)이기 때문
+         */
     }
 }
