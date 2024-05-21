@@ -36,15 +36,17 @@ public class SessionLoginController {
     @PostMapping("/login/session")
     public ResponseEntity<Void> sessionLogin(HttpServletRequest request, HttpSession session) {
         // TODO: HttpRequest로 받은 email과 password 추출
-        String email = "";
-        String password = "";
+        String email = request.getParameter(USERNAME_FIELD);
+        String password = request.getParameter(PASSWORD_FIELD);
 
         if (authService.checkInvalidLogin(email, password)) {
             throw new AuthorizationException();
         }
 
         // TODO: Session에 인증 정보 저장 (key: SESSION_KEY, value: email값)
-
+        session.setAttribute(SESSION_KEY, email);
+        // Set-Cookie: JSESSIONID=89F79E0AA38CAD9081D48CBC35E9C1D4; Path=/; HttpOnly
+        // HttpSession 생성할 때, TOMCAT 에서 자동으로 랜덤한 문자열인 JSESSIONID 생성하여 쿠키에 주입
         return ResponseEntity.ok().build();
     }
 
@@ -58,7 +60,7 @@ public class SessionLoginController {
     @GetMapping("/members/me/session")
     public ResponseEntity<MemberResponse> findMyInfo(HttpSession session) {
         // TODO: Session을 통해 인증 정보 조회 (key: SESSION_KEY)
-        String email = "";
+        String email = session.getAttribute(SESSION_KEY).toString();
         MemberResponse member = authService.findMember(email);
         return ResponseEntity.ok().body(member);
     }
